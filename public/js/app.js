@@ -1040,7 +1040,7 @@ async function handleSpotSearch() {
   // Fetch results from OpenStreetMap Nominatim
   const apiResultsContainer = document.getElementById('external-api-results');
   try {
-    const res = await fetch(\`https://nominatim.openstreetmap.org/search?format=json&q=\${encodeURIComponent(searchQuery)}&limit=5\`, {
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5`, {
       headers: {
         'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8',
         'User-Agent': 'TravelCalendarApp/1.0'
@@ -1053,14 +1053,14 @@ async function handleSpotSearch() {
     apiResultsContainer.innerHTML = '';
     
     if (data.length === 0) {
-      apiResultsContainer.innerHTML = \`
+      apiResultsContainer.innerHTML = `
         <div style="padding: 12px; border: 1px dashed var(--glass-border); border-radius: var(--radius-sm); color: var(--text-muted); font-size: 13px; text-align: center;">
           找不到相符的地標，但您仍可以透過下方按鈕手動加入行程。
         </div>
-        <button class="btn btn-primary w-full" onclick="importSearchedSpotToItinerary('\${encodeURIComponent(query)}')" style="width: 100%; display: flex; justify-content: center; gap: 8px; font-size: 13px; margin-top: 8px;">
-          <i class="fa-solid fa-calendar-plus"></i> 直接將「\${query}」加入行程
+        <button class="btn btn-primary w-full" onclick="importSearchedSpotToItinerary('${encodeURIComponent(query)}')" style="width: 100%; display: flex; justify-content: center; gap: 8px; font-size: 13px; margin-top: 8px;">
+          <i class="fa-solid fa-calendar-plus"></i> 直接將「${query}」加入行程
         </button>
-      \`;
+      `;
       return;
     }
 
@@ -1070,27 +1070,27 @@ async function handleSpotSearch() {
       const card = document.createElement('div');
       card.className = 'rec-spot-card';
       card.style.margin = '0';
-      card.innerHTML = \`
-        <div class="rec-spot-card-cat"><i class="fa-solid fa-map-pin"></i> \${place.type === 'restaurant' || place.type === 'cafe' ? '餐飲' : '景點'}</div>
-        <h4 class="rec-spot-card-title" style="margin-bottom: 4px; font-size: 14px;">\${spotName}</h4>
-        <p class="rec-spot-card-desc" style="font-size: 11px; margin-bottom: 8px; opacity: 0.8; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">\${place.display_name}</p>
-        <button class="btn btn-primary btn-sm" onclick="importExternalSpotToItinerary('\${encodeURIComponent(spotName)}', '\${encodeURIComponent(place.display_name)}')" style="padding: 4px 8px; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;">
+      card.innerHTML = `
+        <div class="rec-spot-card-cat"><i class="fa-solid fa-map-pin"></i> ${place.type === 'restaurant' || place.type === 'cafe' ? '餐飲' : '景點'}</div>
+        <h4 class="rec-spot-card-title" style="margin-bottom: 4px; font-size: 14px;">${spotName}</h4>
+        <p class="rec-spot-card-desc" style="font-size: 11px; margin-bottom: 8px; opacity: 0.8; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${place.display_name}</p>
+        <button class="btn btn-primary btn-sm" onclick="importExternalSpotToItinerary('${encodeURIComponent(spotName)}', '${encodeURIComponent(place.display_name)}')" style="padding: 4px 8px; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;">
           <i class="fa-solid fa-plus"></i> 加入行程
         </button>
-      \`;
+      `;
       apiResultsContainer.appendChild(card);
     });
 
   } catch (err) {
     console.error('Error fetching external spots:', err);
-    apiResultsContainer.innerHTML = \`
+    apiResultsContainer.innerHTML = `
       <div style="padding: 12px; border: 1px dashed var(--danger); border-radius: var(--radius-sm); color: var(--danger); font-size: 13px; text-align: center;">
         地圖服務暫時無法連線，請稍後再試。
       </div>
-      <button class="btn btn-primary w-full" onclick="importSearchedSpotToItinerary('\${encodeURIComponent(query)}')" style="width: 100%; display: flex; justify-content: center; gap: 8px; font-size: 13px; margin-top: 8px;">
-        <i class="fa-solid fa-calendar-plus"></i> 直接將「\${query}」加入行程
+      <button class="btn btn-primary w-full" onclick="importSearchedSpotToItinerary('${encodeURIComponent(query)}')" style="width: 100%; display: flex; justify-content: center; gap: 8px; font-size: 13px; margin-top: 8px;">
+        <i class="fa-solid fa-calendar-plus"></i> 直接將「${query}」加入行程
       </button>
-    \`;
+    `;
   }
 }
 
