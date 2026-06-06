@@ -996,14 +996,22 @@ function handleRemoteTripDelete(tripId) {
    SPOT LIVE SEARCH & MAP PREVIEW
    ========================================================================== */
 
-function handleSpotSearch() {
+async function handleSpotSearch() {
   const query = document.getElementById('spot-search-input').value.trim();
   if (query === '') return;
 
   const resultsContainer = document.getElementById('spot-search-results');
   if (!resultsContainer) return;
 
-  // Render Google Map iframe embed and action buttons
+  // Append city to query for better results if currentTrip is set
+  let searchQuery = query;
+  if (state.currentTrip && state.currentTrip.city) {
+    if (!query.includes(state.currentTrip.city)) {
+       searchQuery = `${state.currentTrip.city} ${query}`;
+    }
+  }
+
+  // Render Loading State & Map iframe
   resultsContainer.innerHTML = `
     <div class="map-preview-wrapper" style="border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--glass-border); height: 320px; position: relative; width: 100%;">
       <iframe 
@@ -1011,23 +1019,79 @@ function handleSpotSearch() {
         height="100%" 
         frameborder="0" 
         style="border:0; background: var(--bg-tertiary);" 
-        src="https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+        src="https://maps.google.com/maps?q=${encodeURIComponent(searchQuery)}&t=&z=15&ie=UTF8&iwloc=&output=embed" 
         allowfullscreen>
       </iframe>
     </div>
     
     <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px; width: 100%;">
       <h4 style="font-family: var(--font-heading); font-size: 15px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 6px;">
-        📍 ${query}
+        📍 搜尋結果：${query}
       </h4>
-      <button class="btn btn-primary w-full" onclick="importSearchedSpotToItinerary('${encodeURIComponent(query)}')" style="width: 100%; display: flex; justify-content: center; gap: 8px; font-size: 13px;">
-        <i class="fa-solid fa-calendar-plus"></i> 將此景點加入行程
-      </button>
-      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="width: 100%; display: flex; justify-content: center; gap: 8px; font-size: 13px; text-decoration: none; align-items: center; color: var(--text-primary);">
+      <div id="external-api-results" style="display:flex; flex-direction:column; gap:8px;">
+         <div style="text-align:center; padding:20px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> 正在搜尋真實地標...</div>
+      </div>
+      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="width: 100%; display: flex; justify-content: center; gap: 8px; font-size: 13px; text-decoration: none; align-items: center; color: var(--text-primary); margin-top: 8px;">
         <i class="fa-solid fa-arrow-up-right-from-square"></i> 在 Google Maps 中開啟
       </a>
     </div>
   `;
+
+  // Fetch results from OpenStreetMap Nominatim
+  const apiResultsContainer = document.getElementById('external-api-results');
+  try {
+    const res = await fetch(\`https://nominatim.openstreetmap.org/search?format=json&q=\${encodeURIComponent(searchQuery)}&limit=5\`, {
+      headers: {
+        'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8',
+        'User-Agent': 'TravelCalendarApp/1.0'
+      }
+    });
+    
+    if (!res.ok) throw new Error('API request failed');
+    const data = await res.json();
+    
+    apiResultsContainer.innerHTML = '';
+    
+    if (data.length === 0) {
+      apiResultsContainer.innerHTML = \`
+        <div style="padding: 12px; border: 1px dashed var(--glass-border); border-radius: var(--radius-sm); color: var(--text-muted); font-size: 13px; text-align: center;">
+          找不到相符的地標，但您仍可以透過下方按鈕手動加入行程。
+        </div>
+        <button class="btn btn-primary w-full" onclick="importSearchedSpotToItinerary('\${encodeURIComponent(query)}')" style="width: 100%; display: flex; justify-content: center; gap: 8px; font-size: 13px; margin-top: 8px;">
+          <i class="fa-solid fa-calendar-plus"></i> 直接將「\${query}」加入行程
+        </button>
+      \`;
+      return;
+    }
+
+    // Render returned spots
+    data.forEach(place => {
+      const spotName = place.name || place.display_name.split(',')[0];
+      const card = document.createElement('div');
+      card.className = 'rec-spot-card';
+      card.style.margin = '0';
+      card.innerHTML = \`
+        <div class="rec-spot-card-cat"><i class="fa-solid fa-map-pin"></i> \${place.type === 'restaurant' || place.type === 'cafe' ? '餐飲' : '景點'}</div>
+        <h4 class="rec-spot-card-title" style="margin-bottom: 4px; font-size: 14px;">\${spotName}</h4>
+        <p class="rec-spot-card-desc" style="font-size: 11px; margin-bottom: 8px; opacity: 0.8; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">\${place.display_name}</p>
+        <button class="btn btn-primary btn-sm" onclick="importExternalSpotToItinerary('\${encodeURIComponent(spotName)}', '\${encodeURIComponent(place.display_name)}')" style="padding: 4px 8px; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%;">
+          <i class="fa-solid fa-plus"></i> 加入行程
+        </button>
+      \`;
+      apiResultsContainer.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error('Error fetching external spots:', err);
+    apiResultsContainer.innerHTML = \`
+      <div style="padding: 12px; border: 1px dashed var(--danger); border-radius: var(--radius-sm); color: var(--danger); font-size: 13px; text-align: center;">
+        地圖服務暫時無法連線，請稍後再試。
+      </div>
+      <button class="btn btn-primary w-full" onclick="importSearchedSpotToItinerary('\${encodeURIComponent(query)}')" style="width: 100%; display: flex; justify-content: center; gap: 8px; font-size: 13px; margin-top: 8px;">
+        <i class="fa-solid fa-calendar-plus"></i> 直接將「\${query}」加入行程
+      </button>
+    \`;
+  }
 }
 
 window.importSearchedSpotToItinerary = function(encodedQuery) {
@@ -1043,6 +1107,24 @@ window.importSearchedSpotToItinerary = function(encodedQuery) {
   document.getElementById('sched-cost-input').value = 0;
   document.getElementById('sched-image-input').value = '';
   document.getElementById('sched-notes-input').value = '經由搜尋景點地圖匯入';
+
+  openModal('schedule-item-modal');
+};
+
+window.importExternalSpotToItinerary = function(encodedName, encodedDesc) {
+  const name = decodeURIComponent(encodedName);
+  const desc = decodeURIComponent(encodedDesc);
+
+  // Pre-fill schedule modal fields
+  document.getElementById('schedule-modal-title').textContent = '匯入外部地圖景點';
+  document.getElementById('sched-item-id').value = '';
+  document.getElementById('sched-title-input').value = name;
+  document.getElementById('sched-time-input').value = '12:00';
+  document.getElementById('sched-category-input').value = 'Attraction'; // Defaults to Attraction
+  document.getElementById('sched-location-input').value = name;
+  document.getElementById('sched-cost-input').value = 0;
+  document.getElementById('sched-image-input').value = '';
+  document.getElementById('sched-notes-input').value = desc;
 
   openModal('schedule-item-modal');
 };
