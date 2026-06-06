@@ -141,7 +141,7 @@ function switchView(viewId) {
 
 async function fetchTrips() {
   try {
-    const res = await fetch('/api/trips');
+    const res = await fetch('/api/trips', { cache: 'no-store' });
     const data = await res.json();
     state.trips = data;
     renderTripsGrid();
@@ -942,7 +942,7 @@ function connectWebSocket() {
 
 async function handleRemoteTripUpdate(tripId) {
   try {
-    const res = await fetch(`/api/trips/${tripId}`);
+    const res = await fetch(`/api/trips/${tripId}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch updated trip');
     const tripData = await res.json();
 
