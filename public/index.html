@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>極境探旅 | Premium Itinerary Planner</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome for Premium Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dark-theme">
+  <!-- App Container -->
+  <div id="app-container">
+    
+    <!-- HEADER BAR -->
+    <header class="app-header">
+      <div class="header-logo" id="header-logo-container">
+        <i class="fa-solid fa-compass-drafting logo-icon"></i>
+        <span class="logo-text">極境探旅 <span class="logo-sub">Travel Planner</span></span>
+      </div>
+      <div class="header-actions">
+        <span id="online-counter" class="badge text-success" style="border-color: rgba(16, 185, 129, 0.3); background-color: rgba(16, 185, 129, 0.1); margin-right: 8px;"><i class="fa-solid fa-users"></i> 線上: 1 人</span>
+
+        <button id="theme-toggle-btn" class="icon-btn" title="切換主題"><i class="fa-solid fa-moon"></i></button>
+      </div>
+    </header>
+
+    <!-- DASHBOARD VIEW -->
+    <section id="dashboard-view" class="app-view active">
+      <div class="dashboard-hero">
+        <div class="hero-content">
+          <h1>探索未知，規劃您的完美旅程</h1>
+          <p>建立自訂行程，結合青森推薦指南，開始您的夢幻假期。</p>
+          <button id="new-trip-trigger" class="btn btn-primary"><i class="fa-solid fa-plus"></i> 新增旅行計畫</button>
+        </div>
+      </div>
+
+      <div class="dashboard-section">
+        <div class="section-header">
+          <h2>我的旅行計畫</h2>
+          <span class="badge" id="trip-count-badge">0 個計畫</span>
+        </div>
+        <div class="trips-grid" id="trips-grid-container">
+          <!-- Dynamically populated trip cards -->
+        </div>
+        <div class="empty-state" id="trips-empty-state">
+          <i class="fa-solid fa-umbrella-beach empty-icon"></i>
+          <h3>還沒有建立任何旅行計畫</h3>
+          <p>點擊上方按鈕建立您的第一個旅行計畫，開啟探索之旅！</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRIP DETAIL VIEW -->
+    <section id="trip-detail-view" class="app-view">
+      <!-- Back to Dashboard -->
+      <div class="navigation-bar">
+        <button id="back-to-dashboard-btn" class="back-btn"><i class="fa-solid fa-arrow-left"></i> 返回儀表板</button>
+        <div style="display: flex; gap: 8px;">
+          <button id="edit-trip-trigger" class="btn btn-outline btn-sm"><i class="fa-solid fa-pen-to-square"></i> 編輯計畫</button>
+          <button id="delete-trip-btn" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash-can"></i> 刪除此旅行</button>
+        </div>
+      </div>
+
+      <!-- Trip Hero Banner -->
+      <div class="trip-banner" id="trip-banner-bg">
+        <div class="trip-banner-overlay"></div>
+        <div class="trip-banner-content">
+          <h1 id="detail-trip-name">青森溫泉美食祭</h1>
+          <p class="trip-banner-dates"><i class="fa-regular fa-calendar-days"></i> <span id="detail-trip-dates">2026.08.02 - 2026.08.05</span></p>
+          <p class="trip-banner-desc" id="detail-trip-desc">青森睡魔祭與八甲田山消暑之行</p>
+        </div>
+      </div>
+
+      <!-- Detail Grid Layout -->
+      <div class="detail-grid">
+        <!-- Sidebar Navigation -->
+        <aside class="detail-sidebar">
+          <nav class="sidebar-nav">
+            <button class="nav-tab active" data-target="tab-itinerary" id="tab-itinerary-btn">
+              <i class="fa-solid fa-timeline"></i> 行程規劃
+            </button>
+            <button class="nav-tab" data-target="tab-budget" id="tab-budget-btn">
+              <i class="fa-solid fa-wallet"></i> 預算統計
+            </button>
+            <button class="nav-tab" data-target="tab-checklist" id="tab-checklist-btn">
+              <i class="fa-solid fa-clipboard-list"></i> 行李清單
+            </button>
+          </nav>
+
+          <!-- Budget Quick Glance Card -->
+          <div class="sidebar-card budget-quick-card">
+            <h3>預算進度</h3>
+            <div class="progress-ring-container">
+              <div class="progress-bar-linear">
+                <div class="progress-fill" id="budget-progress-fill" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="budget-values">
+              <span class="spent" id="budget-quick-spent">$0</span>
+              <span class="divider">/</span>
+              <span class="total" id="budget-quick-total">$30,000</span>
+            </div>
+            <p id="budget-quick-status" class="budget-status-text">預算充裕</p>
+          </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="detail-main">
+          
+          <!-- TAB 1: ITINERARY PLANNER -->
+          <div class="tab-pane active" id="tab-itinerary">
+            <div class="itinerary-header">
+              <!-- Day Selectors -->
+              <div class="day-selector-container" id="day-tabs-container">
+                <!-- Dynamically populated Day 1, Day 2 buttons -->
+              </div>
+              <button id="add-schedule-trigger" class="btn btn-primary btn-sm"><i class="fa-solid fa-calendar-plus"></i> 新增項目</button>
+            </div>
+
+            <div class="itinerary-body-layout">
+              <!-- Timeline Itinerary -->
+              <div class="timeline-container">
+                <div class="timeline" id="timeline-events-container">
+                  <!-- Dynamically populated timeline events -->
+                </div>
+              </div>
+
+              <!-- Spot Search & Map Preview Panel -->
+              <div class="recommendations-panel" id="spot-search-sidebar-panel">
+                <div class="panel-header" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 16px 4px 16px;">
+                  <h3 style="margin: 0;"><i class="fa-solid fa-map-location-dot text-primary"></i> 景點與推薦</h3>
+                  <!-- Tab buttons to switch -->
+                  <div class="sidebar-subtabs" style="display: flex; gap: 8px; border-bottom: 1px solid var(--glass-border); padding-bottom: 4px;">
+                    <button id="sidebar-tab-search-btn" class="sidebar-subtab active" style="flex: 1; padding: 8px; font-size: 13px; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; text-align: center; transition: var(--transition-smooth);"><i class="fa-solid fa-magnifying-glass"></i> 景點搜尋</button>
+                    <button id="sidebar-tab-rec-btn" class="sidebar-subtab" style="flex: 1; padding: 8px; font-size: 13px; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; text-align: center; transition: var(--transition-smooth);"><i class="fa-solid fa-fire text-warning"></i> 熱門景點</button>
+                    <button id="sidebar-tab-rest-btn" class="sidebar-subtab" style="flex: 1; padding: 8px; font-size: 13px; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; text-align: center; transition: var(--transition-smooth);"><i class="fa-solid fa-utensils text-success"></i> 美食餐廳</button>
+                  </div>
+                </div>
+                
+                <!-- Tab Content 1: Search Spot -->
+                <div id="sidebar-content-search" class="sidebar-tab-content" style="display: flex; flex-direction: column; flex-grow: 1; overflow: hidden;">
+                  <div class="panel-filters" style="padding: 16px; border-bottom: 1px solid var(--glass-border);">
+                    <div class="search-box" style="display: flex; gap: 8px; align-items: center;">
+                      <i class="fa-solid fa-magnifying-glass"></i>
+                      <input type="text" id="spot-search-input" placeholder="輸入想搜尋的景點/地址..." style="flex-grow: 1;">
+                      <button id="spot-search-btn" class="btn btn-primary btn-sm" style="padding: 6px 12px; font-size: 12px;"><i class="fa-solid fa-magnifying-glass"></i> 搜尋</button>
+                    </div>
+                  </div>
+
+                  <div class="recommendation-cards" id="spot-search-results" style="padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; flex-grow: 1;">
+                    <!-- Dynamically loaded search map and button -->
+                    <div class="empty-state" style="padding: 40px 10px; border: none; background: transparent;">
+                      <i class="fa-solid fa-map-location empty-icon" style="font-size: 32px; color: var(--text-muted);"></i>
+                      <h4 style="font-size: 14px; margin-top: 10px; color: var(--text-secondary);">請在上方輸入景點並搜尋</h4>
+                      <p style="font-size: 11px; color: var(--text-muted); max-width: 240px; margin-top: 4px;">我們將在此為您展示即時的 Google Maps 預覽與地標資訊。</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Tab Content 2: Popular Recommendations -->
+                <div id="sidebar-content-rec" class="sidebar-tab-content" style="display: none; flex-direction: column; flex-grow: 1; overflow: hidden;">
+                  <!-- Category filter buttons -->
+                  <div class="panel-filters" style="padding: 12px 16px; border-bottom: 1px solid var(--glass-border); overflow-x: auto; white-space: nowrap;">
+                    <div id="popular-rec-categories" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;">
+                      <!-- Dynamically loaded category filters -->
+                    </div>
+                  </div>
+                  <!-- Recommended Cards List -->
+                  <div id="popular-rec-cards" style="padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; flex-grow: 1;">
+                    <!-- Dynamically loaded popular spots -->
+                  </div>
+                </div>
+
+                <!-- Tab Content 3: Recommended Restaurants -->
+                <div id="sidebar-content-rest" class="sidebar-tab-content" style="display: none; flex-direction: column; flex-grow: 1; overflow: hidden;">
+                  <!-- Restaurant Category filter buttons -->
+                  <div class="panel-filters" style="padding: 12px 16px; border-bottom: 1px solid var(--glass-border); overflow-x: auto; white-space: nowrap;">
+                    <div id="popular-rest-categories" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;">
+                      <!-- Dynamically loaded category filters -->
+                    </div>
+                  </div>
+                  <!-- Recommended Restaurant Cards List -->
+                  <div id="popular-rest-cards" style="padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; flex-grow: 1;">
+                    <!-- Dynamically loaded popular restaurants -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- TAB 3: BUDGET TRACKER -->
+          <div class="tab-pane" id="tab-budget">
+            <div class="budget-panel">
+              <div class="budget-summary-grid">
+                <div class="summary-card">
+                  <span class="label">總預算額度</span>
+                  <div class="value-container">
+                    <span class="currency">$</span>
+                    <input type="number" id="budget-total-input" value="30000" class="budget-edit-input">
+                    <button id="save-budget-limit-btn" class="icon-btn-save" title="儲存上限"><i class="fa-solid fa-floppy-disk"></i></button>
+                  </div>
+                </div>
+                <div class="summary-card">
+                  <span class="label">目前累積花費</span>
+                  <span class="value text-primary" id="budget-total-spent">$0</span>
+                </div>
+                <div class="summary-card">
+                  <span class="label">剩餘可用額度</span>
+                  <span class="value" id="budget-remaining-value">$30,000</span>
+                </div>
+              </div>
+
+              <div class="budget-charts-grid">
+                <div class="chart-card">
+                  <h3>類別花費比例</h3>
+                  <div class="budget-chart-container">
+                    <!-- Custom SVG Pie Chart or visual breakdown list -->
+                    <div class="category-breakdown-list" id="budget-category-list">
+                      <!-- Category values dynamically populated -->
+                    </div>
+                  </div>
+                </div>
+
+                <div class="chart-card">
+                  <h3>行程費用明細</h3>
+                  <div class="budget-table-container">
+                    <table class="budget-table">
+                      <thead>
+                        <tr>
+                          <th>項目</th>
+                          <th>類別</th>
+                          <th>花費金額</th>
+                        </tr>
+                      </thead>
+                      <tbody id="budget-table-body">
+                        <!-- Dynamically filled list of costly items -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 4: PACKING CHECKLIST -->
+          <div class="tab-pane" id="tab-checklist">
+            <div class="checklist-panel">
+              <div class="checklist-header">
+                <h3><i class="fa-solid fa-clipboard-check"></i> 出國行李清單</h3>
+                <div class="add-checklist-item">
+                  <select id="checklist-new-cat">
+                    <option value="證件/金流">證件/金流</option>
+                    <option value="衣物">衣物</option>
+                    <option value="電子產品">電子產品</option>
+                    <option value="盥洗用品">盥洗用品</option>
+                    <option value="其他">其他</option>
+                  </select>
+                  <input type="text" id="checklist-new-text" placeholder="新增行李項目...">
+                  <button id="checklist-add-btn" class="btn btn-primary"><i class="fa-solid fa-plus"></i></button>
+                </div>
+              </div>
+
+              <div class="checklist-columns" id="checklist-columns-container">
+                <!-- Checklist groups dynamically populated by category -->
+              </div>
+            </div>
+          </div>
+
+        </main>
+      </div>
+    </section>
+
+  </div> <!-- /App Container -->
+
+  <!-- DIALOGS & MODALS -->
+  
+
+
+  <!-- MODAL 4: EDIT EXISTING TRIP -->
+  <div class="modal-backdrop" id="edit-trip-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>編輯旅行計畫</h2>
+        <button class="modal-close" data-close="edit-trip-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="edit-trip-form">
+          <div class="form-group">
+            <label for="edit-trip-name-input">旅行名稱 *</label>
+            <input type="text" id="edit-trip-name-input" placeholder="例如：青森美味探索賞楓之旅" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-trip-city-input">目的地城市 (例如：東京、青森、京都) *</label>
+              <input type="text" id="edit-trip-city-input" placeholder="例如：東京" required>
+            </div>
+            <div class="form-group">
+              <label for="edit-trip-budget-input">旅行總預算上限 (NTD)</label>
+              <input type="number" id="edit-trip-budget-input" min="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-trip-start-input">開始日期 *</label>
+              <input type="date" id="edit-trip-start-input" required>
+            </div>
+            <div class="form-group">
+              <label for="edit-trip-end-input">結束日期 *</label>
+              <input type="date" id="edit-trip-end-input" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="edit-trip-cover-input">封面圖片連結 (非必填)</label>
+            <input type="url" id="edit-trip-cover-input" placeholder="https://images.unsplash.com/...">
+          </div>
+          <div class="form-group">
+            <label for="edit-trip-desc-input">旅行說明 / 備註</label>
+            <textarea id="edit-trip-desc-input" rows="3" placeholder="簡短紀錄此行的目的與規劃..."></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" data-close="edit-trip-modal">取消</button>
+            <button type="submit" class="btn btn-primary">儲存修改</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 1: CREATE NEW TRIP -->
+  <div class="modal-backdrop" id="new-trip-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>建立新的旅行計畫</h2>
+        <button class="modal-close" data-close="new-trip-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="new-trip-form">
+          <div class="form-group">
+            <label for="trip-name-input">旅行名稱 *</label>
+            <input type="text" id="trip-name-input" placeholder="例如：青森美味探索賞楓之旅" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="trip-city-input">目的地城市 (例如：東京、青森、京都) *</label>
+              <input type="text" id="trip-city-input" placeholder="例如：東京" required>
+            </div>
+            <div class="form-group">
+              <label for="trip-budget-input">旅行總預算上限 (NTD)</label>
+              <input type="number" id="trip-budget-input" value="30000" min="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="trip-start-input">開始日期 *</label>
+              <input type="date" id="trip-start-input" required>
+            </div>
+            <div class="form-group">
+              <label for="trip-end-input">結束日期 *</label>
+              <input type="date" id="trip-end-input" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="trip-cover-input">封面圖片連結 (非必填)</label>
+            <input type="url" id="trip-cover-input" placeholder="https://images.unsplash.com/...">
+          </div>
+          <div class="form-group">
+            <label for="trip-desc-input">旅行說明 / 備註</label>
+            <textarea id="trip-desc-input" rows="3" placeholder="簡短紀錄此行的目的與規劃..."></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" data-close="new-trip-modal">取消</button>
+            <button type="submit" class="btn btn-primary">建立計畫</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: ADD/EDIT SCHEDULE ITEM -->
+  <div class="modal-backdrop" id="schedule-item-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="schedule-modal-title">新增行程項目</h2>
+        <button class="modal-close" data-close="schedule-item-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="schedule-item-form">
+          <input type="hidden" id="sched-item-id">
+          <div class="form-group">
+            <label for="sched-title-input">行程項目名稱 *</label>
+            <input type="text" id="sched-title-input" placeholder="例如：睡魔之家 WA-RASSE" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sched-time-input">時間 *</label>
+              <input type="time" id="sched-time-input" value="12:00" required>
+            </div>
+            <div class="form-group">
+              <label for="sched-category-input">行程分類</label>
+              <select id="sched-category-input">
+                <option value="Attraction">🎡 景點 (Attraction)</option>
+                <option value="Food">🍔 美食 (Food)</option>
+                <option value="Hotel">🏨 住宿 (Hotel)</option>
+                <option value="Transport">🚗 交通 (Transport)</option>
+                <option value="Shopping">🛍️ 購物 (Shopping)</option>
+                <option value="Others">📍 其他 (Others)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sched-location-input">地點 / 地址</label>
+              <input type="text" id="sched-location-input" placeholder="例如：青森市柳川1-1-1">
+            </div>
+            <div class="form-group">
+              <label for="sched-cost-input">花費金額 (NTD / JPY)</label>
+              <input type="number" id="sched-cost-input" value="0" min="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="sched-image-input">景點代表圖片連結 (非必填)</label>
+            <input type="url" id="sched-image-input" placeholder="https://images.unsplash.com/...">
+          </div>
+          <div class="form-group">
+            <label for="sched-notes-input">備註說明</label>
+            <textarea id="sched-notes-input" rows="3" placeholder="填寫詳細活動內容、門票價格或交通資訊..."></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" data-close="schedule-item-modal">取消</button>
+            <button type="submit" class="btn btn-primary" id="schedule-submit-btn">儲存項目</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App JS Logic -->
+  <script src="js/app.js"></script>
+</body>
+</html>
