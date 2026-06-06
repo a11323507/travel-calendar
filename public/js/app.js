@@ -531,7 +531,8 @@ function openScheduleModalForAdd() {
   document.getElementById('schedule-modal-title').textContent = '新增行程項目';
   document.getElementById('schedule-item-form').reset();
   document.getElementById('sched-item-id').value = '';
-  document.getElementById('sched-time-input').value = '12:00';
+  document.getElementById('sched-time-start-input').value = '12:00';
+  document.getElementById('sched-time-end-input').value = '13:00';
   document.getElementById('sched-cost-input').value = '0';
   openModal('schedule-item-modal');
 }
@@ -544,7 +545,9 @@ function openScheduleModalForEdit(itemId) {
   document.getElementById('schedule-modal-title').textContent = '編輯行程項目';
   document.getElementById('sched-item-id').value = item.id;
   document.getElementById('sched-title-input').value = item.title;
-  document.getElementById('sched-time-input').value = item.time;
+  const times = item.time ? item.time.split(' - ') : ['12:00', '13:00'];
+  document.getElementById('sched-time-start-input').value = times[0] || '12:00';
+  document.getElementById('sched-time-end-input').value = times[1] || times[0] || '13:00';
   document.getElementById('sched-category-input').value = item.category;
   document.getElementById('sched-location-input').value = item.location || '';
   document.getElementById('sched-cost-input').value = item.cost || 0;
@@ -559,7 +562,9 @@ async function handleScheduleSubmit(e) {
   
   const id = document.getElementById('sched-item-id').value;
   const title = document.getElementById('sched-title-input').value;
-  const time = document.getElementById('sched-time-input').value;
+  const start = document.getElementById('sched-time-start-input').value;
+  const end = document.getElementById('sched-time-end-input').value;
+  const time = `${start} - ${end}`;
   const category = document.getElementById('sched-category-input').value;
   const location = document.getElementById('sched-location-input').value;
   const cost = Number(document.getElementById('sched-cost-input').value) || 0;
@@ -1101,7 +1106,8 @@ window.importSearchedSpotToItinerary = function(encodedQuery) {
   document.getElementById('schedule-modal-title').textContent = '匯入搜尋景點';
   document.getElementById('sched-item-id').value = '';
   document.getElementById('sched-title-input').value = query;
-  document.getElementById('sched-time-input').value = '12:00';
+  document.getElementById('sched-time-start-input').value = '12:00';
+  document.getElementById('sched-time-end-input').value = '13:00';
   document.getElementById('sched-category-input').value = 'Attraction'; // Defaults to Attraction
   document.getElementById('sched-location-input').value = query;
   document.getElementById('sched-cost-input').value = 0;
@@ -1119,7 +1125,8 @@ window.importExternalSpotToItinerary = function(encodedName, encodedDesc) {
   document.getElementById('schedule-modal-title').textContent = '匯入外部地圖景點';
   document.getElementById('sched-item-id').value = '';
   document.getElementById('sched-title-input').value = name;
-  document.getElementById('sched-time-input').value = '12:00';
+  document.getElementById('sched-time-start-input').value = '12:00';
+  document.getElementById('sched-time-end-input').value = '13:00';
   document.getElementById('sched-category-input').value = 'Attraction'; // Defaults to Attraction
   document.getElementById('sched-location-input').value = name;
   document.getElementById('sched-cost-input').value = 0;
@@ -1404,7 +1411,8 @@ window.importPopularSpotToForm = function(encodedName, encodedDesc) {
   document.getElementById('schedule-modal-title').textContent = '匯入推薦景點';
   document.getElementById('sched-item-id').value = '';
   document.getElementById('sched-title-input').value = name;
-  document.getElementById('sched-time-input').value = '12:00';
+  document.getElementById('sched-time-start-input').value = '12:00';
+  document.getElementById('sched-time-end-input').value = '13:00';
   document.getElementById('sched-category-input').value = 'Attraction'; // Defaults to Attraction
   document.getElementById('sched-location-input').value = name;
   document.getElementById('sched-cost-input').value = 0;
@@ -1422,7 +1430,8 @@ window.importRestaurantToForm = function(encodedName, encodedDesc) {
   document.getElementById('schedule-modal-title').textContent = '匯入推薦餐廳';
   document.getElementById('sched-item-id').value = '';
   document.getElementById('sched-title-input').value = name;
-  document.getElementById('sched-time-input').value = '12:00';
+  document.getElementById('sched-time-start-input').value = '12:00';
+  document.getElementById('sched-time-end-input').value = '13:00';
   document.getElementById('sched-category-input').value = 'Food'; // Defaults to Food
   document.getElementById('sched-location-input').value = name;
   document.getElementById('sched-cost-input').value = 0;
